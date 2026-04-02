@@ -10,7 +10,12 @@ class Settings(BaseSettings):
     SECRET_KEY: str = "change-me-super-secret-key"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 10080
 
-    BACKEND_CORS_ORIGINS=["https://mpit2026-host.vercel.app","http://localhost:5173","http://127.0.0.1:5173"]
+    BACKEND_CORS_ORIGINS: str = (
+        "http://localhost:5173,"
+        "http://127.0.0.1:5173,"
+        "http://localhost:5174,"
+        "http://127.0.0.1:5174"
+    )
 
     GIGACHAT_CREDENTIALS: str | None = None
     GIGACHAT_CLIENT_ID: str | None = None
@@ -52,14 +57,11 @@ class Settings(BaseSettings):
 
         return value
 
-    @field_validator("BACKEND_CORS_ORIGINS", mode="before")
-    @classmethod
-    def parse_cors_origins(cls, value):
-        if isinstance(value, str):
-            return [item.strip() for item in value.split(",") if item.strip()]
-        return value
-
     model_config = SettingsConfigDict(env_file=".env", extra="ignore")
+
+    @property
+    def cors_origins_list(self) -> list[str]:
+        return [item.strip() for item in self.BACKEND_CORS_ORIGINS.split(",") if item.strip()]
 
 
 settings = Settings()
