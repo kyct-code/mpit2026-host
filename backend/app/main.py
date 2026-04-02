@@ -5,12 +5,12 @@ from app.api.auth import router as auth_router
 from app.api.chat import router as chat_router
 from app.api.events import router as events_router
 from app.api.gift_search import router as gift_search_router
+from app.api.invitations import router as invitations_router, public_router as invitations_public_router
 from app.api.recommendations import router as recommendations_router
 from app.api.wishlist import router as wishlist_router
-from app.api.invitations import router as invitations_router, public_router as invitations_public_router
+from app.core.config import settings
 from app.core.database import Base, engine
-
-from app.models import chat, event, user, wishlist, invitation  # noqa: F401
+from app.models import chat, event, invitation, user, wishlist  # noqa: F401
 
 
 Base.metadata.create_all(bind=engine)
@@ -35,16 +35,11 @@ try:
 except Exception:
     pass
 
-app = FastAPI(title="Birthday AI Agent API")
+app = FastAPI(title=settings.APP_NAME)
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        "http://localhost:5173",
-        "http://127.0.0.1:5173",
-        "http://localhost:5174",
-        "http://127.0.0.1:5174",
-    ],
+    allow_origins=settings.BACKEND_CORS_ORIGINS,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -62,4 +57,13 @@ app.include_router(invitations_public_router)
 
 @app.get("/")
 def root():
-    return {"status": "ok"}
+    return {
+        "status": "ok",
+        "service": settings.APP_NAME,
+        "environment": settings.APP_ENV,
+    }
+
+
+@app.get("/health")
+def health():
+    return {"status": "healthy"}
