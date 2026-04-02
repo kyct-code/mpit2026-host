@@ -78,7 +78,10 @@ export async function getMe(token: string): Promise<User> {
   })
 }
 
-export async function updateMe(token: string, payload: { name?: string; region?: string | null }): Promise<User> {
+export async function updateMe(
+  token: string,
+  payload: { name?: string; region?: string | null },
+): Promise<User> {
   return request('/auth/me', {
     method: 'PATCH',
     headers: { Authorization: `Bearer ${token}` },
@@ -118,6 +121,71 @@ export async function listEvents(token: string): Promise<EventItem[]> {
 
 export async function getEvent(token: string, eventId: number): Promise<EventItem> {
   return request(`/events/${eventId}`, {
+    headers: { Authorization: `Bearer ${token}` },
+  })
+}
+
+export async function updateEvent(
+  token: string,
+  eventId: number,
+  payload: {
+    title?: string | null
+    event_date?: string | null
+    budget?: number | null
+    guests_count?: number | null
+    format?: string | null
+    notes?: string | null
+    guest_emails?: string[] | null
+    city?: string | null
+    status?: string | null
+    venue_mode?: string | null
+    selected_option?: string | null
+    selected_option_kind?: string | null
+  },
+): Promise<EventItem> {
+  return request(`/events/${eventId}`, {
+    method: 'PATCH',
+    headers: { Authorization: `Bearer ${token}` },
+    body: JSON.stringify(payload),
+  })
+}
+
+export async function getChatHistory(token: string, eventId: number): Promise<ChatMessage[]> {
+  return request(`/chat/events/${eventId}`, {
+    headers: { Authorization: `Bearer ${token}` },
+  })
+}
+
+export async function sendChatMessage(
+  token: string,
+  eventId: number,
+  message: string,
+): Promise<ChatResponse> {
+  return request(`/chat/events/${eventId}`, {
+    method: 'POST',
+    headers: { Authorization: `Bearer ${token}` },
+    body: JSON.stringify({ message }),
+  })
+}
+
+export async function getEventRecommendations(
+  token: string,
+  eventId: number,
+  options?: { city?: string; limit?: number },
+): Promise<RecommendationsResponse> {
+  const params = new URLSearchParams()
+
+  if (options?.city?.trim()) {
+    params.set('city', options.city.trim())
+  }
+
+  if (options?.limit) {
+    params.set('limit', String(options.limit))
+  }
+
+  const suffix = params.toString() ? `?${params.toString()}` : ''
+
+  return request(`/events/${eventId}/recommendations${suffix}`, {
     headers: { Authorization: `Bearer ${token}` },
   })
 }
