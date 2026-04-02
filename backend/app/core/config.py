@@ -10,12 +10,7 @@ class Settings(BaseSettings):
     SECRET_KEY: str = "change-me-super-secret-key"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 10080
 
-    BACKEND_CORS_ORIGINS: list[str] = [
-        "http://localhost:5173",
-        "http://127.0.0.1:5173",
-        "http://localhost:5174",
-        "http://127.0.0.1:5174",
-    ]
+    BACKEND_CORS_ORIGINS=["https://mpit2026-host.vercel.app","http://localhost:5173","http://127.0.0.1:5173"]
 
     GIGACHAT_CREDENTIALS: str | None = None
     GIGACHAT_CLIENT_ID: str | None = None
