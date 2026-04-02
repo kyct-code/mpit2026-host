@@ -31,6 +31,7 @@ class Settings(BaseSettings):
     GOOGLE_CALENDAR_ENABLED: bool = False
     GOOGLE_CALENDAR_ID: str | None = None
     GOOGLE_SERVICE_ACCOUNT_FILE: str | None = None
+    GOOGLE_SERVICE_ACCOUNT_JSON: str | None = None
     GOOGLE_TIMEZONE: str = "Europe/Moscow"
 
     SMTP_HOST: str = "smtp.gmail.com"

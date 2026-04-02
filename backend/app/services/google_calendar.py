@@ -1,8 +1,9 @@
 from __future__ import annotations
 
+import json
 from datetime import date, timedelta
-from urllib.parse import urlencode
 from typing import Optional
+from urllib.parse import urlencode
 
 from google.oauth2 import service_account
 from googleapiclient.discovery import build
@@ -14,8 +15,24 @@ from app.models.user import User
 
 SCOPES = ["https://www.googleapis.com/auth/calendar"]
 
-
 _calendar_service = None
+
+
+def _build_credentials():
+    if settings.GOOGLE_SERVICE_ACCOUNT_JSON:
+        info = json.loads(settings.GOOGLE_SERVICE_ACCOUNT_JSON)
+        return service_account.Credentials.from_service_account_info(
+            info,
+            scopes=SCOPES,
+        )
+
+    if settings.GOOGLE_SERVICE_ACCOUNT_FILE:
+        return service_account.Credentials.from_service_account_file(
+            settings.GOOGLE_SERVICE_ACCOUNT_FILE,
+            scopes=SCOPES,
+        )
+
+    return None
 
 
 def _get_service():
@@ -25,13 +42,11 @@ def _get_service():
 
     if not settings.GOOGLE_CALENDAR_ENABLED:
         return None
-    if not settings.GOOGLE_SERVICE_ACCOUNT_FILE:
+
+    creds = _build_credentials()
+    if creds is None:
         return None
 
-    creds = service_account.Credentials.from_service_account_file(
-        settings.GOOGLE_SERVICE_ACCOUNT_FILE,
-        scopes=SCOPES,
-    )
     _calendar_service = build("calendar", "v3", credentials=creds, cache_discovery=False)
     return _calendar_service
 
@@ -54,8 +69,6 @@ def create_calendar_event_for_event(
     if service is None:
         return None
 
-    # If date is missing, still create a placeholder on today's date so users
-    # can see it and later adjust in Calendar.
     start_date: date = event.event_date or date.today()
     end_date = start_date + timedelta(days=1)
 
@@ -85,10 +98,6 @@ def create_calendar_event_for_event(
         },
     }
 
-    # NOTE: For consumer Google accounts, service accounts are not allowed to
-    # invite attendees unless you use Google Workspace + Domain-Wide Delegation.
-    # Creating the event directly in the shared calendar is enough.
-
     created = (
         service.events()
         .insert(
@@ -105,8 +114,6 @@ def create_calendar_event_for_event(
 def build_google_calendar_invite_link(event: Event) -> Optional[str]:
     """
     Builds a Google Calendar "TEMPLATE" link that pre-fills guests (emails).
-    This is the best we can do for consumer Gmail without OAuth delegation:
-    user opens the link and clicks "Save" to send invitations.
     """
     if not event.guest_emails:
         return None
@@ -142,15 +149,13 @@ def build_google_calendar_invite_link(event: Event) -> Optional[str]:
 
 
 def diagnose_calendar_access() -> dict:
-    """
-    Small helper for debugging integration in runtime.
-    Returns basic info and a calendar list sample if available.
-    """
     out: dict = {
         "enabled": bool(settings.GOOGLE_CALENDAR_ENABLED),
         "calendar_id": settings.GOOGLE_CALENDAR_ID,
         "service_account_file": settings.GOOGLE_SERVICE_ACCOUNT_FILE,
+        "service_account_json_present": bool(settings.GOOGLE_SERVICE_ACCOUNT_JSON),
     }
+
     service = _get_service()
     if service is None:
         out["service"] = "not_initialized"
@@ -164,5 +169,5 @@ def diagnose_calendar_access() -> dict:
         out["calendar_list_error"] = str(e)
     except Exception as e:
         out["calendar_list_error"] = repr(e)
-    return out
 
+    return out
