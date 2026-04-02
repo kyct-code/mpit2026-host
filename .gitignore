@@ -49,3 +49,5 @@ Thumbs.db
 *.pem
 *.crt
 *.key
+
+backend/service-account.json
