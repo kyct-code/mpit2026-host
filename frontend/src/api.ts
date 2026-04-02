@@ -7,7 +7,12 @@ import type {
   User,
 } from './types'
 
-export const API_URL = import.meta.env.VITE_API_URL?.replace(/\/$/, '') || ''
+const rawApiUrl = import.meta.env.VITE_API_URL
+export const API_URL = rawApiUrl?.replace(/\/$/, '')
+
+if (!API_URL) {
+  throw new Error('VITE_API_URL is not set in Vercel environment variables')
+}
 
 async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
   const response = await fetch(`${API_URL}${path}`, {
