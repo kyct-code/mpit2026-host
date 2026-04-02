@@ -1,53 +1,43 @@
-# secrets
-.env
-.env.*
-!.env.example
-**/.env
-**/.env.*
-!**/.env.example
-
-# Python
-__pycache__/
-*.py[cod]
-*.pyo
-*.pyd
-.python-version
-.venv/
-venv/
-env/
-.pytest_cache/
-.mypy_cache/
-.ruff_cache/
-.coverage
-htmlcov/
-
-# SQLite / local DB
-*.db
-*.sqlite
-*.sqlite3
-
-# logs
-*.log
-logs/
-
-# Node / Vite
 node_modules/
 dist/
 build/
-.vite/
-
-# TypeScript cache
-*.tsbuildinfo
-
-# OS / IDE
+*.log
+*.tmp
+*.temp
 .DS_Store
 Thumbs.db
-.idea/
-.vscode/
-
-# misc
-*.pem
-*.crt
-*.key
-
+frontend/node_modules/
+frontend/dist/
+frontend/.vite/
+frontend/.env
+frontend/.env.*
+frontend/*.local
+backend/.venv/
+backend/venv/
+backend/__pycache__/
+backend/**/*.pyc
+backend/**/*.pyo
+backend/**/*.pyd
 backend/service-account.json
+__pycache__/
+*.py[cod]
+*.pyo
+.env
+.env.*
+*.env
+backend/app/core/config.py
+*.db
+*.sqlite3
+*.sqlite
+backend/*.db
+backend/alembic/versions/*.py
+.pytest_cache/
+.mypy_cache/
+.cache/
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+docker-compose.override.yml
+coverage/
+*.coverage
