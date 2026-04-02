@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
+import { API_URL } from '../api'
 
 interface InvitationData {
   id: number
@@ -32,7 +33,7 @@ export function RSVPPage() {
   useEffect(() => {
     if (!token) return
     
-    fetch(`http://localhost:8000/invitations/rsvp/${token}`)
+    fetch(`${API_URL}/invitations/rsvp/${token}`)
       .then(res => {
         if (!res.ok) throw new Error('Приглашение не найдено')
         return res.json()
@@ -53,7 +54,7 @@ export function RSVPPage() {
     
     setSubmitting(true)
     try {
-      const response = await fetch(`http://localhost:8000/invitations/rsvp/${token}`, {
+      const response = await fetch(`${API_URL}/invitations/rsvp/${token}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
